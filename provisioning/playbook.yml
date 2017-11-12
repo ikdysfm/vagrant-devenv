@@ -3,6 +3,7 @@
   vars:
     cache_valid_time: 3600
     dotfiles_path: /src/github.com/ikdysfm/dotfiles # .gitconfigに書いてあるghqの設定と合わせること
+    gopath: /home/vagrant/.go # .bashrcなどの記述と合わせること
   tasks:
     # - name: set locale
       # lineinfile:
@@ -61,19 +62,25 @@
       become: no
 
     - name: check golang module
-      shell: /bin/bash -lc "go list {{ item }}" # .bashrc内のGOPATHを有効にするためlcオプション付きで呼ぶ
+      # shell: /bin/bash -lc "go list {{ item }}" # .bashrcから読みたかったが動かない
+      command: go list {{ item }}
       register: go_module_check
       failed_when: go_module_check.rc not in [0, 1]
       changed_when: go_module_check.rc not in [0, 1]
       with_items:
         - github.com/motemen/ghq
       become: no
+      environment:
+        GOPATH: "{{ gopath }}"
 
     - name: install golang modules
-      shell: /bin/bash -lc "go get {{ item.item }}"
+      # shell: /bin/bash -lc "go get {{ item.item }}"
+      command: go get {{ item.item }}
       when: item.rc == 1 # チェック結果で存在していなかった場合のみ
       with_items: "{{ go_module_check.results }}" # 配列で格納される
       become: no
+      environment:
+        GOPATH: "{{ gopath }}"
 
     # ■デフォルトシェルをfishに
 
