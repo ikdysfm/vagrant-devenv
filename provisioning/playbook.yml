@@ -1,0 +1,86 @@
+- hosts: localhost
+  become: yes
+  vars:
+    cache_valid_time: 3600
+    dotfiles_path: /src/github.com/ikdysfm/dotfiles # .gitconfigに書いてあるghqの設定と合わせること
+  tasks:
+    # - name: set locale
+      # lineinfile:
+        # path: /etc/default/locale
+        # regexp: ^LANG=
+        # line: LANG=ja_JP.UTF-8
+    
+    - name: set timezone
+      timezone:
+        name: Asia/Tokyo
+      
+    # - name: dpmsとスクリーンセーバーの無効化
+      # command: xset s off -dpms # unable to open display というエラーになる。ForwardX11の設定が足りない？
+      # また、コマンドが成功してもスクリーンセーバーが起動してしまうので何かが足りないはず
+      # become: no
+    
+    - name: add apt-key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        keyring: /etc/apt/trusted.gpg.d/microsoft.gpg
+        
+    - name: add apt-repository
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+    
+    - name: apt install
+      apt:
+        name: "{{ item.name }}"
+        state: "{{ item.state }}"
+        cache_valid_time: "{{ cache_valid_time }}" # 2.4以降の場合cache_valid_timeを指定すると自動でupdate_cache=yes
+      with_items:
+        - { name: xubuntu-desktop, state: present }
+        - { name: language-pack-ja, state: latest }
+        - { name: fish, state: latest }
+        - { name: git, state: latest }
+        - { name: vim, state: latest }
+        - { name: tmux, state: latest }
+        - { name: golang, state: latest }
+        - { name: code, state: latest }
+    
+    - name: clone dotfiles
+      git: 
+        repo: git@github.com:ikdysfm/dotfiles.git # pushには鍵を作るかssh-agentを使う
+        dest: ~{{ dotfiles_path }}
+      become: no
+    
+    - name: create dotfiles symlinks
+      file:
+        src: ~{{ dotfiles_path }}/{{ item }}
+        dest: ~/{{ item }}
+        state: link
+        force: yes
+      with_items:
+        - .gitconfig
+        - .bashrc
+      become: no
+    
+    - name: check golang module
+      shell: /bin/bash -lc "go list {{ item }}" # .bashrc内のGOPATHを有効にするためlcオプション付きで呼ぶ
+      register: go_module_check
+      failed_when: go_module_check.rc not in [0, 1]
+      changed_when: go_module_check.rc not in [0, 1]
+      with_items:
+        - github.com/motemen/ghq
+      become: no
+
+    - name: install golang modules
+      shell: /bin/bash -lc "go get {{ item.item }}"
+      when: item.rc == 1 # チェック結果で存在していなかった場合のみ
+      with_items: "{{ go_module_check.results }}" # 配列で格納される
+      become: no
+    
+    # ■デフォルトシェルをfishに
+
+
+  # 各タスクで変更があった場合、notifyで指定するnameに合致するものが実行される。複数回適用されても起動するのは一度だけ
+  # handlers:
+    # - name: notifyで指定する名前
+      # command: shutdown -r now
+      # listen: notifyで指定される文言とnameを別にしたい場合はここで指定
+      
