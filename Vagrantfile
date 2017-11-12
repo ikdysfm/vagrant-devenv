@@ -17,7 +17,7 @@ end
 
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/ubuntu-16.04"
-  
+
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
   # Forwarded Ports
   # ホストの8080番ポートへのアクセスをゲストの80番ポートにフォワードする例
   # host_ip, guest_ipはipを限定するものでデフォルトは'empty'らしい。詳細な挙動についてはちゃんと調べる
-  # 自動衝突検知からのポート番号変更(範囲指定可)も可能で、UDPも指定できる 
+  # 自動衝突検知からのポート番号変更(範囲指定可)も可能で、UDPも指定できる
   # 通すべきポートが多いと明示的に指定するのが面倒という短所がある
   # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
   #
@@ -49,29 +49,29 @@ Vagrant.configure("2") do |config|
   # ホスト側でssh-agentを起動しておく必要がある
   # とりあえず都度ゲストで鍵を作ることにする
   # config.ssh.forward_agent = true
-  
+
   # プロバイダ固有の設定。詳しくはドキュメントを見る
   config.vm.provider "virtualbox" do |vb|
     config.vbguest.auto_update = true # vbguestプラグインが必要
     config.vbguest.no_remote = false # リモートからダウンロードする
-	vb.name = "xubuntu"
+    vb.name = "xubuntu"
     vb.gui = true
-	vb.cpus = 2
+    vb.cpus = 2
     vb.memory = "4096"
-	vb.customize [
-	  # https://www.virtualbox.org/manual/ch08.html
+    vb.customize [
+      # https://www.virtualbox.org/manual/ch08.html
       "modifyvm", :id,
-	  "--clipboard", "bidirectional", # クリップボードの共有
+      "--clipboard", "bidirectional", # クリップボードの共有
       "--draganddrop", "bidirectional", # ドラッグ&ドロップ
-	  "--chipset", "ich9", # チップセット
-	  "--ioapic", "on", # I/O APICを有効化
-	  "--rtcuseutc", "on", # ハードウェアクロックをUTCにする
-	  "--cpuexecutioncap", "100", # 使用率制限
-	  "--pae", "on", # PAE/NXを有効化
-	  "--paravirtprovider", "hyperv", # 準仮想化インタフェース
-	  "--hwvirtex", "on", # VT-x/AMD-Vを有効化
-	  "--nestedpaging", "on", # ネステッドページングを有効化
-	  "--largepages", "on", # ハイパーバイザがlargepageを使用する
+      "--chipset", "ich9", # チップセット
+      "--ioapic", "on", # I/O APICを有効化
+      "--rtcuseutc", "on", # ハードウェアクロックをUTCにする
+      "--cpuexecutioncap", "100", # 使用率制限
+      "--pae", "on", # PAE/NXを有効化
+      "--paravirtprovider", "hyperv", # 準仮想化インタフェース
+      "--hwvirtex", "on", # VT-x/AMD-Vを有効化
+      "--nestedpaging", "on", # ネステッドページングを有効化
+      "--largepages", "on", # ハイパーバイザがlargepageを使用する
       "--vram", "256", # ビデオメモリー
       "--accelerate3d", "on", # 3Dアクセラレーションを有効化
     ]
@@ -80,23 +80,23 @@ Vagrant.configure("2") do |config|
   # v1.3より、初回up時以外は明示的に指定しないとプロビジョニングは行われない
   config.vm.provision "shell", inline: <<-SHELL
     # privilegedオプション未指定だとrootで実行される
-	if [ -f "/var/vagrant_provision" ]; then
-	  exit 0 # 一回限りの実行とする
-	fi
-	# aptの利用リポジトリを日本サーバーに変更する
-	sed -i.bak -e "s%http://[^ ]\+%http://ftp.jaist.ac.jp/pub/Linux/ubuntu/%g" /etc/apt/sources.list
-	touch /var/vagrant_provision
+    if [ -f "/var/vagrant_provision" ]; then
+      exit 0 # 一回限りの実行とする
+    fi
+    # aptの利用リポジトリを日本サーバーに変更する
+    sed -i.bak -e "s%http://[^ ]\+%http://ftp.jaist.ac.jp/pub/Linux/ubuntu/%g" /etc/apt/sources.list
+    touch /var/vagrant_provision
   SHELL
-  
+
   config.vm.provision "ansible_local" do |ansible|
     # https://www.vagrantup.com/docs/provisioning/ansible_common.html
-	ansible.compatibility_mode = "2.0"
-	ansible.provisioning_path = "/vagrant/provisioning" # cfgファイル置き場であり、inventory_pathとplaybookはここからの相対パスとなる
+    ansible.compatibility_mode = "2.0"
+    ansible.provisioning_path = "/vagrant/provisioning" # cfgファイル置き場であり、inventory_pathとplaybookはここからの相対パスとなる
     ansible.inventory_path = "hosts"
-	ansible.playbook = "playbook.yml"
-	ansible.limit = "localhost" # ansibleのhostsと一致させる必要がある。省略すると仮想マシン名を指定したことになる
-	# ansible.verbose = "v"
+    ansible.playbook = "playbook.yml"
+    ansible.limit = "localhost" # ansibleのhostsと一致させる必要がある。省略すると仮想マシン名を指定したことになる
+    # ansible.verbose = "v"
   end
-  
+
   # vagrant-rebootを入れようかと思ったが保留。初回のGUI環境インストール後は手動で再起動することにする
 end
