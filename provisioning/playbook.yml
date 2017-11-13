@@ -15,6 +15,13 @@
       timezone:
         name: Asia/Tokyo
 
+    - name: set shell and ssh-key
+      user:
+        name: vagrant
+        shell: /usr/bin/fish
+        generate_ssh_key: yes
+        ssh_key_bits: 4096
+
     # - name: dpmsとスクリーンセーバーの無効化
       # command: xset s off -dpms # unable to open display というエラーになる。ForwardX11の設定が足りない？
       # また、コマンドが成功してもスクリーンセーバーが起動してしまうので何かが足りないはず
@@ -41,6 +48,7 @@
         - { name: git, state: latest }
         - { name: vim, state: latest }
         - { name: tmux, state: latest }
+        - { name: mlocate, state: latest }
         - { name: golang, state: latest }
         - { name: code, state: latest }
 
@@ -81,9 +89,6 @@
       become: no
       environment:
         GOPATH: "{{ gopath }}"
-
-    # ■デフォルトシェルをfishに
-
 
   # 各タスクで変更があった場合、notifyで指定するnameに合致するものが実行される。複数回適用されても起動するのは一度だけ
   # handlers:
