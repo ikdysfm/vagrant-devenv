@@ -78,15 +78,15 @@ Vagrant.configure("2") do |config|
   end
 
   # v1.3より、初回up時以外は明示的に指定しないとプロビジョニングは行われない
-  config.vm.provision "shell", inline: <<-SHELL
+  # config.vm.provision "shell", inline: <<-SHELL
     # privilegedオプション未指定だとrootで実行される
-    if [ -f "/var/vagrant_provision" ]; then
-      exit 0 # 一回限りの実行とする
-    fi
+    # if [ -f "/var/vagrant_provision" ]; then
+      # exit 0 # 一回限りの実行とする
+    # fi
     # aptの利用リポジトリを日本サーバーに変更する
-    sed -i.bak -e "s%http://[^ ]\+%http://ftp.jaist.ac.jp/pub/Linux/ubuntu/%g" /etc/apt/sources.list
-    touch /var/vagrant_provision
-  SHELL
+    # sed -i.bak -e "s%http://[^ ]\+%http://ftp.jaist.ac.jp/pub/Linux/ubuntu/%g" /etc/apt/sources.list
+    # touch /var/vagrant_provision
+  # SHELL
 
   config.vm.provision "ansible_local" do |ansible|
     # https://www.vagrantup.com/docs/provisioning/ansible_common.html
