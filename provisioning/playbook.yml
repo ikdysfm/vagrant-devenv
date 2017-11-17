@@ -74,6 +74,7 @@
       with_items:
         - { name: git/.gitconfig, dest: ~/.gitconfig }
         - { name: fish/config.fish, dest: ~/.config/fish/config.fish }
+        - { name: fish/functions, dest: ~/.config/fish/functions }
       become: no
 
     - name: check golang module
