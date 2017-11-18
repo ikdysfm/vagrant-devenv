@@ -36,13 +36,17 @@
 
     - name: add apt-key
       apt_key:
-        url: https://packages.microsoft.com/keys/microsoft.asc
-        keyring: /etc/apt/trusted.gpg.d/microsoft.gpg
+        url: "{{ item.url }}"
+        keyring: "{{ item.keyring }}"
+      with_items:
+        - { url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub', keyring: /etc/apt/trusted.gpg.d/microsoft.gpg }
+        - { url: 'https://packages.microsoft.com/keys/microsoft.asc', keyring: /etc/apt/trusted.gpg.d/microsoft.gpg }
 
     - name: add apt-repository
       apt_repository:
         repo: "{{ item }}"
       with_items:
+        - deb http://dl.google.com/linux/chrome/deb/ stable main
         - deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
         - 'ppa:fish-shell/release-2'
 
@@ -67,6 +71,7 @@
         - { name: tmux, state: latest }
         - { name: mlocate, state: latest }
         - { name: golang, state: latest }
+        - { name: google-chrome-stable, state: latest }
         - { name: code, state: latest }
 
     - name: clone dotfiles
