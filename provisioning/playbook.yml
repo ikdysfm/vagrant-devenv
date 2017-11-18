@@ -84,6 +84,7 @@
       with_items:
         - { name: git/.gitconfig, dest: ~/.gitconfig }
         - { name: fish/config.fish, dest: ~/.config/fish/config.fish }
+        - { name: fish/config/fishfile, dest: ~/.config/fish/fishfile }
         - { name: fish/functions, dest: ~/.config/fish/functions }
       become: no
 
@@ -107,6 +108,15 @@
       become: no
       environment:
         GOPATH: "{{ gopath }}"
+
+    - name: install fish plugins
+      shell: fisher
+      register: install_fish_plugins_result
+      changed_when: False
+      failed_when: install_fish_plugins_result.rc not in [0]
+      become: no
+      args:
+        executable: /usr/bin/fish
 
   # 各タスクで変更があった場合、notifyで指定するnameに合致するものが実行される。複数回適用されても起動するのは一度だけ
   # handlers:
