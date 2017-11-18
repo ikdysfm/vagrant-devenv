@@ -84,7 +84,7 @@
       with_items:
         - { src: git/.gitconfig, dest: ~/.gitconfig }
         - { src: fish/config.fish, dest: ~/.config/fish/config.fish }
-        - { src: fish/config/fishfile, dest: ~/.config/fish/fishfile }
+        - { src: fish/fishfile, dest: ~/.config/fish/fishfile }
         - { src: fish/functions/fisher.fish, dest: ~/.config/fish/functions/fisher.fish }
         - { src: fish/functions/provision.fish, dest: ~/.config/fish/functions/provision.fish }
       become: no
