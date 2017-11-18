@@ -41,13 +41,23 @@
 
     - name: add apt-repository
       apt_repository:
-        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+        repo: "{{ item }}"
+      with_items:
+        - deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+        - 'ppa:fish-shell/release-2'
+
+    # aptモジュールのupdate_cacheを使うとエラーになるので回避
+    - name: apt update
+      shell: apt update
+      register: apt_update_result
+      changed_when: False
+      failed_when: apt_update_result.rc not in [0] # 警告もOKにするなら100とか追加
 
     - name: apt install
       apt:
         name: "{{ item.name }}"
         state: "{{ item.state }}"
-        cache_valid_time: "{{ cache_valid_time }}" # 2.4以降の場合cache_valid_timeを指定すると自動でupdate_cache=yes
+        # cache_valid_time: "{{ cache_valid_time }}" # 2.4以降の場合cache_valid_timeを指定すると自動でupdate_cache=yes
       with_items:
         - { name: xubuntu-desktop, state: present }
         - { name: language-pack-ja, state: latest }
