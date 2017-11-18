@@ -77,15 +77,16 @@
 
     - name: create dotfiles symlinks
       file:
-        src: ~{{ dotfiles_path }}/{{ item.name }}
+        src: ~{{ dotfiles_path }}/{{ item.src }}
         dest: "{{ item.dest }}"
         state: link
         force: yes
       with_items:
-        - { name: git/.gitconfig, dest: ~/.gitconfig }
-        - { name: fish/config.fish, dest: ~/.config/fish/config.fish }
-        - { name: fish/config/fishfile, dest: ~/.config/fish/fishfile }
-        - { name: fish/functions, dest: ~/.config/fish/functions }
+        - { src: git/.gitconfig, dest: ~/.gitconfig }
+        - { src: fish/config.fish, dest: ~/.config/fish/config.fish }
+        - { src: fish/config/fishfile, dest: ~/.config/fish/fishfile }
+        - { src: fish/functions/fisher.fish, dest: ~/.config/fish/functions/fisher.fish }
+        - { src: fish/functions/provision.fish, dest: ~/.config/fish/functions/provision.fish }
       become: no
 
     - name: check golang module
