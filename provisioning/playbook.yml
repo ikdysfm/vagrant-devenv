@@ -75,6 +75,14 @@
         dest: ~{{ dotfiles_path }}
       become: no
 
+    - name: create directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - '~/.config/fish/functions'
+      become: no
+
     - name: create dotfiles symlinks
       file:
         src: ~{{ dotfiles_path }}/{{ item.src }}
@@ -109,6 +117,26 @@
       become: no
       environment:
         GOPATH: "{{ gopath }}"
+
+    - name: get latest peco version
+      shell: curl -sI https://github.com/peco/peco/releases/latest | awk -F'/' '/^Location:/{print $NF}'
+      register: peco_latest_version
+      changed_when: False
+      failed_when: apt_update_result.rc not in [0]
+      become: no
+      args:
+        warn: false
+
+    - name: download latest peco
+      get_url: url=https://github.com/peco/peco/releases/download/{{ peco_latest_version.stdout }}/peco_linux_amd64.tar.gz dest=/tmp/peco_linux_amd64.tar.gz
+      become: no
+
+    - name: extract peco
+      unarchive: src=/tmp/peco_linux_amd64.tar.gz dest=/tmp/
+      become: no
+
+    - name: copy to /usr/local/bin/peco
+      copy: src=/tmp/peco_linux_amd64/peco dest=/usr/local/bin/ mode=0755
 
     - name: install fish plugins
       shell: fisher
