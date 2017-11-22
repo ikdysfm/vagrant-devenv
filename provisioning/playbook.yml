@@ -65,6 +65,8 @@
       with_items:
         - { name: xubuntu-desktop, state: present }
         - { name: language-pack-ja, state: latest }
+        - { name: ibus-skk, state: latest }
+        - { name: skkdic, state: latest }
         - { name: fish, state: latest }
         - { name: git, state: latest }
         - { name: vim, state: latest }
@@ -100,6 +102,7 @@
         - { src: fish/fishfile, dest: ~/.config/fish/fishfile }
         - { src: fish/functions/fisher.fish, dest: ~/.config/fish/functions/fisher.fish }
         - { src: fish/functions/provision.fish, dest: ~/.config/fish/functions/provision.fish }
+        - { src: fish/functions/nvm.fish, dest: ~/.config/fish/functions/nvm.fish }
       become: no
 
     - name: check golang module
@@ -127,7 +130,7 @@
       shell: curl -sI https://github.com/peco/peco/releases/latest | awk -F'/' '/^Location:/{print $NF}'
       register: peco_latest_version
       changed_when: False
-      failed_when: apt_update_result.rc not in [0]
+      failed_when: peco_latest_version.rc not in [0]
       become: no
       args:
         warn: false
@@ -142,6 +145,15 @@
 
     - name: copy to /usr/local/bin/peco
       copy: src=/tmp/peco_linux_amd64/peco dest=/usr/local/bin/ mode=0755
+
+    - name: download latest nvm
+      shell: curl -o- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+      register: download_nvm_result
+      changed_when: False
+      failed_when: download_nvm_result.rc not in [0]
+      become: no
+      args:
+        warn: false
 
     - name: install fish plugins
       shell: fisher
