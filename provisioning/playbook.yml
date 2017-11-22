@@ -70,6 +70,7 @@
         - { name: ibus-skk, state: latest }
         - { name: skkdic, state: latest }
         - { name: fish, state: latest }
+        - { name: direnv, state: latest }
         - { name: git, state: latest }
         - { name: vim, state: latest }
         - { name: tmux, state: latest }
