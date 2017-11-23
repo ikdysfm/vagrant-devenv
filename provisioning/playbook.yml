@@ -66,6 +66,7 @@
       with_items:
         - { name: xubuntu-desktop, state: present }
         - { name: language-pack-ja, state: latest }
+        - { name: fonts-ricty-diminished, state: latest }
         - { name: mlocate, state: latest }
         - { name: ibus-skk, state: latest }
         - { name: skkdic, state: latest }
@@ -91,6 +92,7 @@
         state: directory
       with_items:
         - '~/.config/fish/functions'
+        - '/tmp/MyricaM'
       become: no
 
     - name: create dotfiles symlinks
@@ -107,6 +109,19 @@
         - { src: fish/functions/provision.fish, dest: ~/.config/fish/functions/provision.fish }
         - { src: fish/functions/nvm.fish, dest: ~/.config/fish/functions/nvm.fish }
       become: no
+
+    - name: download latest Myrica M
+      unarchive:
+        src: https://github.com/tomokuni/Myrica/raw/master/product/MyricaM.zip
+        dest: /tmp/MyricaM/
+        remote_src: yes
+      failed_when: False # ファイル名のせい？で一部ファイル展開時にエラーになるので無視する
+      become: no
+
+    - name: copy to /usr/local/share/fonts/MyricaM.TTC
+      copy:
+        src: /tmp/MyricaM/MyricaM.TTC
+        dest: /usr/local/share/fonts/
 
     - name: check golang module
       # shell: /bin/bash -lc "go list {{ item }}" # .bashrcから読みたかったが動かない
@@ -139,15 +154,17 @@
         warn: false
 
     - name: download latest peco
-      get_url: url=https://github.com/peco/peco/releases/download/{{ peco_latest_version.stdout }}/peco_linux_amd64.tar.gz dest=/tmp/peco_linux_amd64.tar.gz
-      become: no
-
-    - name: extract peco
-      unarchive: src=/tmp/peco_linux_amd64.tar.gz dest=/tmp/
+      unarchive:
+        src: https://github.com/peco/peco/releases/download/{{ peco_latest_version.stdout }}/peco_linux_amd64.tar.gz
+        dest: /tmp/
+        remote_src: yes
       become: no
 
     - name: copy to /usr/local/bin/peco
-      copy: src=/tmp/peco_linux_amd64/peco dest=/usr/local/bin/ mode=0755
+      copy:
+        src: /tmp/peco_linux_amd64/peco
+        dest: /usr/local/bin/
+        mode: 0755
 
     - name: download latest nvm
       shell: curl -o- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
