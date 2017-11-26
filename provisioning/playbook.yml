@@ -75,6 +75,7 @@
         - { name: git, state: latest }
         - { name: vim, state: latest }
         - { name: tmux, state: latest }
+        - { name: launchy, state: latest }
         - { name: yarn, state: latest }
         - { name: golang, state: latest }
         - { name: google-chrome-stable, state: latest }
@@ -108,6 +109,7 @@
         - { src: fish/functions/fisher.fish, dest: ~/.config/fish/functions/fisher.fish }
         - { src: fish/functions/provision.fish, dest: ~/.config/fish/functions/provision.fish }
         - { src: fish/functions/nvm.fish, dest: ~/.config/fish/functions/nvm.fish }
+        - { src: tmux/.tmux.conf, dest: ~/.tmux.conf }
       become: no
 
     - name: download latest Myrica M
