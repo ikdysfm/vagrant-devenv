@@ -104,6 +104,7 @@
         force: yes
       with_items:
         - { src: git/.gitconfig, dest: ~/.gitconfig }
+        - { src: git/.gitignore_global, dest: ~/.gitignore_global }
         - { src: fish/config.fish, dest: ~/.config/fish/config.fish }
         - { src: fish/fishfile, dest: ~/.config/fish/fishfile }
         - { src: fish/functions/fisher.fish, dest: ~/.config/fish/functions/fisher.fish }
