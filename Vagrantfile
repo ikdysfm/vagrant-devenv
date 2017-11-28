@@ -3,7 +3,7 @@
 
 # 必須プラグインの自動インストール
 # ~/.vagrant.d/Vagrantfileに分離して共通化しても良いかも
-required_plugins = %w(sahara vagrant-vbguest)
+required_plugins = %w(sahara vagrant-vbguest vagrant-cachier)
 
 plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
 if not plugins_to_install.empty?
@@ -50,6 +50,19 @@ Vagrant.configure("2") do |config|
   # とりあえず都度ゲストで鍵を作ることにする
   # config.ssh.forward_agent = true
 
+  # キャッシュ設定
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box # box単位かmachine単位か
+    config.cache.synced_folder_opts = {
+      # type: :nfs, # ホストがwindowsだと対応してない
+      # The nolock option can be useful for an NFSv3 client that wants to avoid the
+      # NLM sideband protocol. Without this option, apt-get might hang if it tries
+      # to lock files needed for /var/cache/* operations. All of this can be avoided
+      # by using NFSv4 everywhere. Please note that the tcp option is not the default.
+      mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+    }
+  end
+  
   # プロバイダ固有の設定。詳しくはドキュメントを見る
   config.vm.provider "virtualbox" do |vb|
     config.vbguest.auto_update = true # vbguestプラグインが必要
