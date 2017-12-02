@@ -110,6 +110,7 @@
         - { src: fish/functions/fisher.fish, dest: ~/.config/fish/functions/fisher.fish }
         - { src: fish/functions/provision.fish, dest: ~/.config/fish/functions/provision.fish }
         - { src: fish/functions/nvm.fish, dest: ~/.config/fish/functions/nvm.fish }
+        - { src: fish/functions/tmux_smart_attach.fish, dest: ~/.config/fish/functions/tmux_smart_attach.fish }
         - { src: tmux/.tmux.conf, dest: ~/.tmux.conf }
       become: no
 
