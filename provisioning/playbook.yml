@@ -79,6 +79,7 @@
         - { name: yarn, state: latest }
         - { name: golang, state: latest }
         - { name: python3, state: latest }
+        - { name: python3-pip, state: latest }
         - { name: google-chrome-stable, state: latest }
         - { name: code, state: latest }
 
