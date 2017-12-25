@@ -50,6 +50,7 @@
         - deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
         - deb https://dl.yarnpkg.com/debian/ stable main
         - 'ppa:fish-shell/release-2'
+        - 'ppa:jonathonf/python-3.6'
 
     # aptモジュールのupdate_cacheを使うとエラーになるので回避
     - name: apt update
@@ -78,11 +79,20 @@
         - { name: launchy, state: latest }
         - { name: yarn, state: latest }
         - { name: golang, state: latest }
-        - { name: python3, state: latest }
-        - { name: python3-pip, state: latest }
-        - { name: python3-venv, state: latest }
+        - { name: python3.6, state: latest }
+        - { name: python3.6-dev, state: latest }
+        - { name: python3.6-venv, state: latest }
         - { name: google-chrome-stable, state: latest }
         - { name: code, state: latest }
+
+    - name: install pip
+      shell: curl https://bootstrap.pypa.io/get-pip.py | sudo python3.6
+      register: install_pip
+      changed_when: False
+      failed_when: install_pip.rc not in [0]
+      become: no
+      args:
+        warn: false
 
     - name: clone dotfiles
       git:
